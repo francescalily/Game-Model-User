@@ -39,35 +39,43 @@ loadingManager.onError = () => {
 
 const textureLoader = new THREE.TextureLoader(loadingManager);
 const grassTexture = textureLoader.load("/textures/grass.jpeg");
-
-// const gltfLoader = new GLTFLoader();
-// gltfLoader.load("/models/Human/glTF-Embedded/RiggedFigure.gltf", (gltf) => {
-//   scene.add(gltf.scene.children[0]);
-//   console.log("success");
-//   console.log(gltf);
-//   //one way of loading model
-//   //   while (gltf.scene.children.length) {
-//   //     scene.add(gltf.scene.children[0]);
-//   //   }
-//   //this duplicates the array so that it doesn't remove the inital array
-//   const children = [...gltf.scene.children];
-//   for (const child of children) {
-//     scene.add(child);
-//   }
-
-//   //this by itself works as well adding the wholw thing
-//   scene.add(gltf.scene);
-// });
-
-//to support draco compressed version - way to do this is have to decode by copying the three.js example in node module then writing code below with both draco loader and
-const dracoLoader = new DRACOLoader();
-dracoLoader.setDecoderPath("/draco/");
+let mixer = null;
 
 const gltfLoader = new GLTFLoader();
-gltfLoader.setDRACOLoader(dracoLoader);
-gltfLoader.load("/models/Duck/glTF-Draco/Duck.gltf", (gltf) => {
+gltfLoader.load("/models/Human/glTF-Embedded/RiggedFigure.gltf", (gltf) => {
+  //for animation the gltf object conains animations property composed of mutliple animation clips - they are classes
+  //have to use three.js animation mixer, where it can play one or many animation clips
+  mixer = new THREE.AnimationMixer(gltf.scene);
+  const action = (mixer.clipAction = mixer.clipAction(gltf.animations[0]));
+  action.play();
+  console.log(action.play);
+  // scene.add(gltf.scene.children[0]);
+  // console.log("success");
+  // console.log(gltf);
+  // //one way of loading model
+  // //   while (gltf.scene.children.length) {
+  // //     scene.add(gltf.scene.children[0]);
+  // //   }
+  // //this duplicates the array so that it doesn't remove the inital array
+  // const children = [...gltf.scene.children];
+  // for (const child of children) {
+  //   scene.add(child);
+  // }
+
+  //this by itself works as well adding the wholw thing
+  gltf.scene.scale.set(1.2, 1.2, 1.2);
   scene.add(gltf.scene);
 });
+
+//to support draco compressed version - way to do this is have to decode by copying the three.js example in node module then writing code below with both draco loader and
+// const dracoLoader = new DRACOLoader();
+// dracoLoader.setDecoderPath("/draco/");
+
+// const gltfLoader = new GLTFLoader();
+// gltfLoader.setDRACOLoader(dracoLoader);
+// gltfLoader.load("/models/Duck/glTF-Draco/Duck.gltf", (gltf) => {
+//   scene.add(gltf.scene);
+// });
 
 /**
  * Floor
@@ -163,6 +171,11 @@ const tick = () => {
   const elapsedTime = clock.getElapsedTime();
   const deltaTime = elapsedTime - previousTime;
   previousTime = elapsedTime;
+
+  //update animation mixer
+  if (mixer !== null) {
+    mixer.update(deltaTime);
+  }
 
   // Update controls
   controls.update();
