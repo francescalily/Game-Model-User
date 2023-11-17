@@ -3,6 +3,7 @@ import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import GUI from "lil-gui";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 
+import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader";
 /**
  * Base
  */
@@ -39,20 +40,33 @@ loadingManager.onError = () => {
 const textureLoader = new THREE.TextureLoader(loadingManager);
 const grassTexture = textureLoader.load("/textures/grass.jpeg");
 
+// const gltfLoader = new GLTFLoader();
+// gltfLoader.load("/models/Human/glTF-Embedded/RiggedFigure.gltf", (gltf) => {
+//   scene.add(gltf.scene.children[0]);
+//   console.log("success");
+//   console.log(gltf);
+//   //one way of loading model
+//   //   while (gltf.scene.children.length) {
+//   //     scene.add(gltf.scene.children[0]);
+//   //   }
+//   //this duplicates the array so that it doesn't remove the inital array
+//   const children = [...gltf.scene.children];
+//   for (const child of children) {
+//     scene.add(child);
+//   }
+
+//   //this by itself works as well adding the wholw thing
+//   scene.add(gltf.scene);
+// });
+
+//to support draco compressed version - way to do this is have to decode by copying the three.js example in node module then writing code below with both draco loader and
+const dracoLoader = new DRACOLoader();
+dracoLoader.setDecoderPath("/draco/");
+
 const gltfLoader = new GLTFLoader();
-gltfLoader.load("/models/Human/glTF-Embedded/RiggedFigure.gltf", (gltf) => {
-  scene.add(gltf.scene.children[0]);
-  console.log("success");
-  console.log(gltf);
-  //one way of loading model
-  //   while (gltf.scene.children.length) {
-  //     scene.add(gltf.scene.children[0]);
-  //   }
-  //this duplicates the array so that it doesn't remove the inital array
-  const children = [...gltf.scene.children];
-  for (const child of children) {
-    scene.add(child);
-  }
+gltfLoader.setDRACOLoader(dracoLoader);
+gltfLoader.load("/models/Duck/glTF-Draco/Duck.gltf", (gltf) => {
+  scene.add(gltf.scene);
 });
 
 /**
@@ -62,8 +76,8 @@ const floor = new THREE.Mesh(
   new THREE.PlaneGeometry(10, 10),
   new THREE.MeshStandardMaterial({
     // color: "#444444",
-    // metalness: 0,
-    // roughness: 0.5,
+    metalness: 0,
+    roughness: 0.5,
     map: grassTexture,
   })
 );
