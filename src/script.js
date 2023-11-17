@@ -39,6 +39,12 @@ loadingManager.onError = () => {
 
 const textureLoader = new THREE.TextureLoader(loadingManager);
 const grassTexture = textureLoader.load("/textures/grass.jpeg");
+
+grassTexture.generateMipmaps = false;
+// grassTexture.minFilter = THREE.NearestFilter;
+grassTexture.magFilter = THREE.NearestFilter;
+// grassTexture.center.y = 0.5;
+
 let mixer = null;
 
 const gltfLoader = new GLTFLoader();
@@ -81,7 +87,7 @@ gltfLoader.load("/models/Human/glTF-Embedded/RiggedFigure.gltf", (gltf) => {
  * Floor
  */
 const floor = new THREE.Mesh(
-  new THREE.PlaneGeometry(10, 10),
+  new THREE.PlaneGeometry(100, 100),
   new THREE.MeshStandardMaterial({
     // color: "#444444",
     metalness: 0,
