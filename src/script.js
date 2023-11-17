@@ -22,6 +22,22 @@ const scene = new THREE.Scene();
 //   console.log("success");
 //   console.log(gltf);
 // });
+const loadingManager = new THREE.LoadingManager();
+
+loadingManager.onStart = () => {
+  console.log("onStart");
+};
+
+loadingManager.onProgress = () => {
+  console.log("onProgess");
+};
+
+loadingManager.onError = () => {
+  console.log("onError");
+};
+
+const textureLoader = new THREE.TextureLoader(loadingManager);
+const grassTexture = textureLoader.load("/textures/grass.jpeg");
 
 const gltfLoader = new GLTFLoader();
 gltfLoader.load("/models/Human/glTF-Embedded/RiggedFigure.gltf", (gltf) => {
@@ -32,7 +48,7 @@ gltfLoader.load("/models/Human/glTF-Embedded/RiggedFigure.gltf", (gltf) => {
   //   while (gltf.scene.children.length) {
   //     scene.add(gltf.scene.children[0]);
   //   }
-
+  //this duplicates the array so that it doesn't remove the inital array
   const children = [...gltf.scene.children];
   for (const child of children) {
     scene.add(child);
@@ -45,9 +61,10 @@ gltfLoader.load("/models/Human/glTF-Embedded/RiggedFigure.gltf", (gltf) => {
 const floor = new THREE.Mesh(
   new THREE.PlaneGeometry(10, 10),
   new THREE.MeshStandardMaterial({
-    color: "#444444",
-    metalness: 0,
-    roughness: 0.5,
+    // color: "#444444",
+    // metalness: 0,
+    // roughness: 0.5,
+    map: grassTexture,
   })
 );
 floor.receiveShadow = true;
